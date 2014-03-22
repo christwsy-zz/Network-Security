@@ -12,6 +12,7 @@ public class SimpleServer extends SimpleParser implements Runnable{
    ServerSocket server = null;
    Thread runner;
 
+
    public SimpleServer(int local_port, 
                        String ident, 
                        String pwd){
@@ -27,7 +28,7 @@ public class SimpleServer extends SimpleParser implements Runnable{
    }
 
    public void start(){
-      if(runner == null){
+      if (runner == null){
          runner = new Thread(this);
          runner.start();
       }
@@ -69,19 +70,24 @@ class ConnectionHandler extends SimpleParser implements Runnable{
          while(true){
             String msg = in.readLine();
             System.out.println(msg);
-            if(in == null) continue;
-            if(msg.contains("REQUIRE:")) handleRequire(msg);
-            else if(msg.contains("RESULT:")) handleResult(msg);
-            else if(msg.contains("WAITING:")) ;
-            else if(msg.contains("COMMAND_ERROR:")) ;
-            else if(msg.contains("COMMENT:")) ;
-            else if(msg.contains("PARTICIPANT_PASSWORD_CHECKSUM:")) handleChecksum(msg);
-            else if(msg.contains("QUIT")){
+            if (in == null) continue;
+            
+            if (msg.contains("REQUIRE:")) handleRequire(msg);
+            else if (msg.contains("RESULT:")) handleResult(msg);
+            else if (msg.contains("WAITING:")) ;
+            else if (msg.contains("COMMAND_ERROR:")) ;
+            else if (msg.contains("COMMENT:")) ;
+            else if (msg.contains("PARTICIPANT_PASSWORD_CHECKSUM:")) handleChecksum(msg);
+            else if (getRequireCmd(msg).equals("QUIT")){
                incoming.close();
                break;
             }
-            else{ // Encryption used
-            }
+            else handleEncryptedCommand(msg);
+            // else if (getRequireCmd(msg).equals("IDENT")) sendIdent();
+            // else if (getRequireCmd(msg).equals("ALIVE")) sendAlive();
+            // else{ // Encryption used
+            //    handleMessage(msg);
+            // }
          }
 
          incoming.close();
@@ -91,7 +97,7 @@ class ConnectionHandler extends SimpleParser implements Runnable{
          try {
             incoming.close();
          } catch (IOException e) {
-            System.err.println("Waht?! " + e);
+            System.err.println("What?! " + e);
          }
          return;
       }

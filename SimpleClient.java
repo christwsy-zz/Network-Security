@@ -6,8 +6,6 @@ import java.lang.*;
 public class SimpleClient extends SimpleParser implements Runnable{
    public static String MONITOR_ADDRESS;
    public static int MONITOR_PORT;
-   final int CONNECTION_TIMEOUT = 60 * 1000; // in milli-seconds
-   public static String cookie = ""; // Used for server side when receive ALIVE
    Socket client = null;
    Thread runner;
 
@@ -39,7 +37,7 @@ public class SimpleClient extends SimpleParser implements Runnable{
    }
 
    public void start(){
-      if(runner == null){
+      if (runner == null){
          runner = new Thread(this);
          runner.start();
       }
@@ -57,33 +55,21 @@ public class SimpleClient extends SimpleParser implements Runnable{
             in = new BufferedReader(new InputStreamReader(client.getInputStream()));
             out = new PrintWriter(client.getOutputStream(), true);
 
-            long lastTimeout = System.currentTimeMillis();
-            long currentTime; 
-            
             String msg = in.readLine();
             while(msg != null){
-               currentTime = System.currentTimeMillis();
-               if(currentTime - lastTimeout >= CONNECTION_TIMEOUT){
-                  System.out.println("**LOCAL RECONNECT MONITOR**");
-                  sendIdent();
-                  lastTimeout = currentTime;
-                  msg = in.readLine();
-                  System.out.println("MONITOR: " + msg);  
-               }
-               else{
-                  if(msg.contains("REQUIRE:")) handleRequire(msg);
-                  else if(msg.contains("RESULT:")) handleResult(msg);
-                  System.out.println("MONITOR: " + msg);  
-                  msg = in.readLine();
-               }
+               System.out.println("MONITOR: " + msg); 
+               handleMessage(msg);
+               msg = in.readLine();
             }
          }catch(IOException e){
             System.err.println(e);
             try{
+               System.out.print("LOCAL  :Connection Closing..\n");
                client.close();
             }catch(IOException ioe){
             }catch(NullPointerException n){
                try{
+                  System.out.print("LOCAL  :Connection Closing..\n");
                   client.close();
                }catch(IOException ioe){}
             }

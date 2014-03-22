@@ -38,10 +38,8 @@ class Project {
 
    public static void main(String[] args) {
       Project project;
-      if (args.length == 3) {
-         MONITOR_ADDRESS = new String(args[0]);
-         MONITOR_PORT = Integer.parseInt(args[1]);
-         project = new Project(args[2], "-----");
+      if (args.length == 2) {
+         project = new Project(args[0], args[1]);
       }
       else{
          // System.out.println("java Project Monitor_Address Monitor_Port Identity");
@@ -49,6 +47,7 @@ class Project {
          project = new Project(randomString(5), randomString(12));
       }
       project.sc.start(); //Start Active Client
+      System.out.println("Le me start server!");
       project.ss.start();  //Start Local Server
    }       
 }
